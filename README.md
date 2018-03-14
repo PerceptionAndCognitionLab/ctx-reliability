@@ -1,4 +1,4 @@
-This repository contains all material for the manuscript  "A Psychometrics of Individual Differences in Experimental Tasks".
+This repository contains all material for the manuscript  **A Psychometrics of Individual Differences in Experimental Tasks**.
 
 Data come from Hedge et al. (In Press), and are provided in the directory `share/hedgeData`. The directory also contains a README for the data.
 
