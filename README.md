@@ -1,4 +1,4 @@
-#ctx-reliability
+# ctx-reliability
 
 This repository contains all material for the manuscript  **A Psychometrics of Individual Differences in Experimental Tasks**.
 
