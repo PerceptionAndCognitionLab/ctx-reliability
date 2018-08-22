@@ -123,8 +123,8 @@
 
   \author{Jeffrey N. Rouder\textsuperscript{1}~\& Julia M. Haaf\textsuperscript{2}}
 
-  \def\affdep{{"", ""}}%
-  \def\affcity{{"", ""}}%
+  % \def\affdep{{"", ""}}%
+  % \def\affcity{{"", ""}}%
 
   \affiliation{
     \vspace{0.5cm}
@@ -132,38 +132,38 @@
           \textsuperscript{2} University of Missouri  }
 
   \authornote{
-    \newcounter{author}
     We are indebted to Craig Hedge for making data available, working with
     us to insure we understand them, and providing comments on this work.
     The data and analysis code for this project may be found at
     \url{https://github.com/PerceptionAndCognitionLab/ctx-reliability}
+    
+    Correspondence concerning this article should be addressed to Jeffrey N.
+    Rouder, . E-mail:
+    \href{mailto:jrouder@uci.edu}{\nolinkurl{jrouder@uci.edu}}
+  }
 
-                      Correspondence concerning this article should be addressed to Jeffrey N. Rouder. E-mail: \href{mailto:jrouder@uci.edu}{\nolinkurl{jrouder@uci.edu}}
-                          }
+  \note{Version 2, 7/2018}
 
-  \note{Version 1, 3/2018}
-
-  \abstract{One vexing problem in cognition is the dramatic attenuation of
-correlations among inhibition tasks that purportedly tap similar
-underlying constructs. Individuals that show large Stroop effects, for
-example, do not show any larger flanker or Simon effects than average
-(Rey-Mermet et al., in press). A pressing question then is whether these
-attenuated correlations reflect statistical considerations, such as a
-lack of individual variability on tasks, or substantive considerations,
-such as that inhibition is not a unified concept. One problem in
-addressing this question is that researchers aggregate performance
-across trials to tally individual-by-task scores, and the covariation of
-these scores is subsequently studied much as it would be with classical
-test theory. It is tempting to think that aggregation here is fine and
-everything comes out in the wash, but as shown, it renders
-classical-test-theory concepts of reliability, effect size and
-correlation deeply flawed. We propose an alternative psychometrics of
+  \abstract{In modern individual-difference studies, researchers often correlate
+performance on various tasks to uncover common latent processes. Yet, in
+some sense, the results have been disappointing as correlations among
+tasks that seemingly have processes in common are often low. A pressing
+question then is whether these attenuated correlations reflect
+statistical considerations, such as a lack of individual variability on
+tasks, or substantive considerations, such as that inhibition in
+different tasks is not a unified concept. One problem in addressing this
+question is that researchers aggregate performance across trials to
+tally individual-by-task scores, and the covariation of these scores is
+subsequently studied much as it would be with classical test theory. It
+is tempting to think that aggregation here is fine and everything comes
+out in the wash, but as shown here, it greately attenuates measures of
+effect size and correlation. We propose an alternative psychometrics of
 task performance that is based on accounting for trial-by-trial
 variability along with the covariation of individuals' performance
-across tasks. The implementation is through common Bayesian hierarchical
-models, and this treatment rescues classical concepts of effect size,
+across tasks. The implementation is through common hierarchical models,
+and this treatment rescues classical concepts of effect size,
 reliability, and correlation for studying individual differences with
-experimental tasks. We show using recent data from Hedge et al. (2018)
+experimental tasks. Using recent data from Hedge et al. (2018) we show
 that there is Bayes-factor support for a lack of correlation between the
 Stroop and flanker task. This support for a lack of correlation
 indicates a psychologically relevant result---Stroop and flanker
@@ -182,18 +182,22 @@ Bayesian Inference \\
   \usepackage{amsmath}
   \usepackage{setspace}
   \usepackage{pcl}
+  \usepackage{makecell}
 
 \usepackage{amsthm}
-\newtheorem{theorem}{Theorem}
-\newtheorem{lemma}{Lemma}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}{Lemma}[section]
 \theoremstyle{definition}
-\newtheorem{definition}{Definition}
-\newtheorem{corollary}{Corollary}
-\newtheorem{proposition}{Proposition}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{corollary}{Corollary}[section]
+\newtheorem{proposition}{Proposition}[section]
 \theoremstyle{definition}
-\newtheorem{example}{Example}
+\newtheorem{example}{Example}[section]
+\theoremstyle{definition}
+\newtheorem{exercise}{Exercise}[section]
 \theoremstyle{remark}
 \newtheorem*{remark}{Remark}
+\newtheorem*{solution}{Solution}
 \begin{document}
 
 \maketitle
@@ -218,120 +222,94 @@ The final class of variables is performance on experimental tasks. These
 experimental tasks are often used to assess cognitive abilities in
 memory, attention, and perception.
 
-On the face of it, individual-difference researchers should be sanguine
-about using scores from experimental tasks. For one, many of these tasks
-are robust in that the effects are easy to obtain in a variety of
-circumstances. Take, for example, the Stroop task, which may be used as
-a measure of inhibition. The Stroop effect is so robust, it is
-considered universal (Haaf \& Rouder, 2017; MacLeod, 1991). Another
-advantage is that many of these tasks have been designed to isolate
+On the face of it, individual-difference researchers should be confident
+about using scores from experimental tasks for the following reasons:
+First, many of these tasks are robust in that the effects are easy to
+obtain in a variety of circumstances. Take, for example, the Stroop
+task, which may be used as a measure of inhibition. The Stroop effect is
+so robust, it is considered universal (Haaf \& Rouder, 2017; MacLeod,
+1991). Second, many of these tasks have been designed to isolate
 specific cognitive processes. The Stroop task, for example, requires
 participants to inhibit the prepotent process of reading. Third, because
 these tasks are laboratory based and center on experimenter-controlled
 manipulations, they often have a high degree of internal validity.
 Fourth, because these tasks are used so often, there is usually a large
 literature about them to guide implementation and interpretation. It is
-no wonder they have become popular in the study of individual
-differences.
+no wonder task-based measures have become popular in the study of
+individual differences.
 
 Yet, there has been a wrinkle in the setup. As it turns out, these
-task-based measures correlate with one another far less than one might
-think \emph{a priori.} The best example of these wrinkles is perhaps in
-the individual-differences study of inhibition tasks (Friedman \&
-Miyake, 2004; Ito et al., 2015; Pettigrew \& Martin, 2014; Rey-Mermet,
-Gade, \& Oberauer, 2018; Stahl et al., 2014). In these large-scale
-individual-differences studies, researchers correlated scores in a
-variety of tasks that require inhibitory control. An example of two such
-tasks are the Stroop task (Stroop, 1935) and the flanker task (Eriksen
-\& Eriksen, 1974). Correlations among inhibition tasks are notoriously
-low; most do not exceed .2 in value. The Stroop and flanker tasks, in
-particular, seemingly do not correlate at all (Hedge, Powell, \& Sumner,
-2018; Rey-Mermet et al., 2018; Stahl et al., 2014). These low
-correlations are not limited to inhibition tasks. Ito et al. (2015)
-considered several implicit attitude tasks used for measuring implicit
-bias. Here again, there is surprisingly little correlation among tasks
-that purportedly measure the same concept.
+task-based measures designed to measure the same latent concepts do not
+correlate heavily with one another. The best example of these wrinkles
+is perhaps in the individual-differences study of inhibition tasks
+(Friedman \& Miyake, 2004; Ito et al., 2015; Pettigrew \& Martin, 2014;
+Rey-Mermet, Gade, \& Oberauer, 2018; Stahl et al., 2014). In these
+large-scale individual-differences studies, researchers correlated
+scores in a variety of tasks that require inhibitory control. An example
+of two such tasks are the Stroop task (Stroop, 1935) and the flanker
+task (Eriksen \& Eriksen, 1974). Correlations among inhibition measures
+are notoriously low; most do not exceed .2 in value. The Stroop and
+flanker measures, in particular, seemingly do not correlate at all
+(Hedge, Powell, \& Sumner, 2018; Rey-Mermet et al., 2018; Stahl et al.,
+2014). These low correlations are not limited to measures of inhibition.
+Ito et al. (2015) considered several implicit attitude tasks used for
+measuring implicit bias. Here again, there is surprisingly little
+correlation among bias measures that purportedly measure the same
+concept.
 
-Why correlations are so low among these tasks is a mystery (Hedge et
-al., 2018; Rey-Mermet et al., 2018). After all, these tasks are robust,
-easy-to-obtain, and seemingly measure the same basic concepts. There are
-perhaps two leading explanations: One is that the problem is mostly
-statistical. High correlations may only be obtained if the tasks are
-highly reliable, and low correlations are not intepretable without high
-reliability. Hedge et al. document a range of test-retest reliabilities
-across tasks, with most tasks having reliabilities below .7 in value,
-and some tasks having reliabilities below .4 in value. In effect, the
-problem is that people simply don't vary enough in some tasks given the
-resolution of the data to document correlations. The second explanation
-is that the lack of correlation is substantive. The presence of low
-correlations in large-sampled studies means that the tasks are truly
-measuring different sources of variation. In the inhibition case, the
-ubiquity of low correlations in large-sample studies has led Rey-Mermet
-et al. (2018) to make a substantive claim that the psychological concept
-of inhibition is not unified at all.
+Why correlations are so low among these task-based measures is a mystery
+(Hedge et al., 2018; Rey-Mermet et al., 2018). After all, the effects
+are robust, easy-to-obtain, and seemingly measure the same basic
+concepts. There are perhaps two leading explanations: One is that the
+problem is mostly substantive. The presence of low correlations in
+large-sampled studies may imply that the tasks are truly measuring
+different sources of variation. In the inhibition case, the ubiquity of
+low correlations in large-sample studies has led Rey-Mermet et al.
+(2018) to make a substantive claim that the psychological concept of
+inhibition is not unified at all. The second explanation is that the
+lack of correlation is mostly methodological. High correlations may only
+be obtained if the tasks are highly reliable, and low correlations are
+not interpretable without high reliability. Hedge and colleagues
+document a range of test-retest reliabilities across tasks, with most
+tasks having reliabilities below .7 in value, and some tasks having
+reliabilities below .4 in value. In effect, the problem is that people
+simply don't vary enough in some tasks given the resolution of the data
+to document correlations.
 
-Researchers typically use classical test theory, at least implicitly,
-when studying individual differences. They make this choice when they
-tally up an individual's data into a performance score. For example, in
-the Stroop task, we may score each person's performance by the mean
-difference in response times between the incongruent and congruent
-trials. Because there is a single performance score per person per task,
-tasks are very much treated as instruments. When trials are aggregated
-into a single score, the instrument (or experiment) is a \emph{test} and
-classical test theory serves as the analytic framework.
+Researchers typically use classical test theory, at least implicitly, to
+inform methodology when studying individual differences. They make this
+choice when they tally up an individual's data into a performance score.
+For example, in the Stroop task, we may score each person's performance
+by the mean difference in response times between the incongruent and
+congruent trials. Because there is a single performance score per person
+per task, tasks are very much treated as instruments. When trials are
+aggregated into a single score, the instrument (or experiment) is a
+\emph{test} and classical test theory serves as the analytic framework.
 
 The unit of analysis in classical test theory is the test, or in our
-case, the experimental task. Reliability and effect size, for example,
+case, the experimental task. Theoretically important quantities, say
+effect size within a task and correlations across tasks, for example,
 are assigned to the task itself and not to a particular sample or a
 particular sample size. For instance, when a test developer states that
-an instrument has test-retest reliability of .80, that value holds as a
+an instrument has test-retest correlation of .80, that value holds as a
 population truth for all samples. We may see more noise if we
 re-estimate that value in smaller samples, but, on whole, the underlying
 population value of an instrument does not depend on the researcher's
 sample size. We call this desirable property \emph{portability.}
 
-We may contrast classical test theory to item-response theory (Lord \&
-Novick, 1968). In item-response theory, the main unit of analysis is the
-item rather than the test. Properties of the test, say reliability and
-correlation, are replaced with properties of items, say item difficulty
-and item disciminability. Yet, for tasks, where items are trials, item
-difficulty and discriminability are not as helpful as concepts of
-reliability and correlation. It is no surprise, therefore, that
-researchers tend to use classical test theory, with its focus on the
-task rather than the trial, to conceptualize individual differences in
-tasks.
-
-The main problem with using classical test theory, however, is that
-portability is grossly violated. Concepts of reliability and effect
+The main problem with using classical test theory for experimental
+tasks, however, is that portability is violated. Concepts of effect
 sizes within a task and correlations across tasks are critical functions
 of sample sizes (Green et al., 2016). As a result, different researchers
-will be estimating different truths when they invariably have different
-sample sizes. We show how dramatically portability is violated in
+will estimate different truths if they have different sample sizes.
+
+In the next section, we show how dramatically portability is violated in
 practice, and how much these violations affect the interpretability of
-classical statistics.
-
-In this paper, we gain portability in experimental tasks by using a
-straightforward hierarchical model to account simultaneously for
-trial-by-trial variability, session variability, and individuals'
-variability. The outputs are the estimates of individuals' effects,
-variability in these effects, and shared covariation of these effects
-across tasks. These outputs are portable across different sample sizes
-including different numbers of trials per participant and different
-numbers of participants. Hence, they preserve their meaning across
-different studies and are broadly interpretable. This enhanced
-interpretability licenses their use in addressing the low-correlation
-mystery.
-
-The application of hierarchical models to trial-by-trial performance
-data in experimental tasks is not new. Previous applications in
-individual-differences research include Schmiedek, Oberauer, Wilhelm,
-Süß, \& Wittmann (2007) and Voelkle, Brose, Schmiedek, \& Lindenberger
-(2014). Moreover, trial-by-trial hierarchical modeling is well known in
-cognitive psychology (Lee \& Webb, 2005; Rouder \& Lu, 2005) and
-linguistics (Baayen, Tweedie, \& Schreuder, 2002). That said, to our
-knowledge, using hierarchical models to make classical test-theory
-concepts portable in experimental settings is novel. It is tasty,
-low-hanging fruit on the methodological tree.
+classical statistics. These failures serve as motivation for a call to
+use hierarchical linear models that model trial-by-trial variation as
+well as variation across individuals. We develop these models, and then
+apply them to address the low-correlation mystery between flanker and
+Stroop tasks.
 
 \section{The Dramatic Failure of
 Portability}\label{the-dramatic-failure-of-portability}
@@ -342,7 +320,7 @@ often given in a specific order. When we speak of portability, we speak
 of porting characteristics of this fixed unit to other settings, usually
 to other sample sizes in similar populations. In experimental tasks, we
 have several different sample sizes. One is the number of individuals in
-the sample; others are the numbers of trials each individual completed
+the sample; another is the number of trials each individual completed
 within the various conditions in the task. We wish to gain portability
 across both of these sample-size dimensions. For example, suppose one
 team runs 50 people each observing 50 trials in each condition and
@@ -356,16 +334,25 @@ well.
 But standard psychometric measures that are portable for instruments
 fail dramatically on tasks. To show this failure, we reanalyze data from
 a few tasks from Hedge et al. (2018). Hedge et al. compiled an
-impressively large data set. They asked individuals to perform an
-exceptionally large number of trials on several tasks. For example, in
-their Stroop task, participants completed a total of 1440 trials each.
-The usual number for individual-differences studies is on the order of
-10s or 100s of trials each. Moreover, Hedge et al. explicitly set up
-their design to measure test-retest reliability. Individuals performed
-720 trials in the first session, and then, three-weeks later, performed
-the remaining 720 trials in a second session. Here, we use the Hedge et
-al. data set to assess conventional measures of effect size and
-reliability are dependent on the number of trials per condition.
+impressively large data set. They asked individuals to perform a large
+number of trials on several tasks. For example, in their Stroop task,
+participants completed a total of 1440 trials each. The usual number for
+individual-differences studies is on the order of 10s or 100s of trials
+each. Moreover, Hedge et al. explicitly set up their design to measure
+test-retest reliability. Individuals performed 720 trials in the first
+session, and then, three-weeks later, performed the remaining 720 trials
+in a second session.\footnote{Hedge ran 144 trials per block with 5
+  blocks per session for a total of 10 blocks. These 144 trials were
+  divided into three conditions: congruent, neutral, and incongruent. We
+  do not use the neutral condition in our analysis. As a result, there
+  are 48 trials per individual per condition per block, or 480 trials
+  per individual per condition in the experiment. Once we discarded
+  errors, RTs that were too fast or slow, and warm-up trials, there were
+  on average 42 trials per individual per condition per block. Our
+  discard parameters are documented in the markdown version of this
+  document.} Here, we use the Hedge et al. data set to assess how
+conventional measures of effect size and reliability are dependent on
+the number of trials per condition.
 
 The following notation is helpful for specifying the conventional
 approach to effect size and reliability. Let \(\bar{Y}_{ijk}\) be the
@@ -379,15 +366,17 @@ between mean incongruent and congruent response times:
 d_{ij}=\bar{Y}_{ij2}-\bar{Y}_{ij1}. 
 \end{equation}
 
-The effect per individual can be averaged across sessions and denoted
-\(\bar{d}_{i}\). The grand mean effect is just the mean of these
-individual effects; the effect size is just the ratio of this grand mean
-to the standard deviation of these effects, i.e.,
+Two quantities of interest can be calculated from these individual
+effects: The effect size and the test-retest reliability. To calculate
+the effect size, we first average the session-by-individual effects
+across sessions to obtain individuals' effects denoted \(\bar{d}_{i}\).
+The effect size is just the ratio of the grand mean of the individual
+effects to the standard deviation of these effects, i.e.,
 es\(=\)mean(\(\bar{d}_{i}\))\(/\)sd(\(\bar{d}_{i}\)). The test-retest
-reliability is the correlation of individuals' effect scores for the
-first session (\(j=1\)) to the second session (\(j=2\)).
+reliability is the correlation of session-by-individual effect scores
+for the first session (\(j=1\)) to the second session (\(j=2\)).
 
-Figure~\ref{fig:portability} shows a lack of portability in these
+Figure~\ref{fig:portability} shows a lack of portability in these two
 measures. We randomly selected different subsets of the Hedge et al.'s
 data and computed effect sizes and test-retest reliabilities. We varied
 the number of trials per condition per individual from 20 to 400, and
@@ -415,221 +404,260 @@ point is the mean over 100 different samples at the indicated sample
 size.}
 \end{figure}
 
-We think the above results may be surprising. The critical and outsized
-role of replicates is seemingly under appreciated. Many researchers are
-quick to highlight the numbers of individuals in studies. You may find
-this number repeatedly in tables, abstracts, method sections, and
-sometimes in general discussions. Researchers do not, however, highlight
-the number of replicates per condition per individual. These numbers
-rarely appear in abstracts or tables; in fact, it usually takes careful
-hunting to find them in the method section if they are there at all. And
+The critical and outsized role of replicates is seemingly
+under-appreciated in practice. Many researchers are quick to highlight
+the numbers of individuals in studies. You may find this number
+repeatedly in tables, abstracts, method sections, and sometimes in
+general discussions. Researchers do not, however, highlight the number
+of replicates per condition per individual. These numbers rarely appear
+in abstracts or tables; in fact, it usually takes careful hunting to
+find them in the method section if they are there at all. And
 researchers are far less likely to discuss the numbers of replicates in
 interpreting their results. And yet, as shown above, this number of
 replicates is absolutely critical in understanding classical results.
 
-One approach is to ask, \enquote{what is an appropriate number of
-replicates?} (Hedge et al., 2018). This approach, however, strikes us as
-unfortunate for studying individual differences because whatever the
-number, the meaning of reliability, correlation, and effect size is
-still tied to that number. Instead, a better approach is to strive for
-portability---the meaning of reliability, correlation and effect size
-should be independent of the number of replicates. We use simple
-hierarchical statistical models to make these quantities portable. Our
-approach is to consider the effects sizes, reliabilities, and
-correlations in the large-sample limit of trials per individual. While
-in reality individuals perform finite trials, we may use statistical
-models to query what may reasonably happen in the limit. And estimates
-of these values in the limit become portable estimates of effect sizes,
-reliabilities, and correlations. Low numbers of replicates certainly
-affect the quality of the estimates, but the true value---the value
-being estimated---does not change with the number of replicates.
-
 \section{A Hierarchical Model}\label{a-hierarchical-model}
 
-Portability may be gained by using rather ordinary hierarchical models
-to account for trial-by-trial variation and individual variation
-simultaneously.
+\subsection{Gaining Portability in The Limit of Infinite
+Trials}\label{gaining-portability-in-the-limit-of-infinite-trials}
+
+In this paper, we strive for portability---the meaning of correlation
+and effect size should be independent of the number of trials in
+component tasks. Portability is largely solved in classical test theory
+by using standardized instruments, say intelligence tests of fixed
+length. Yet, we think it is unreasonable to expect the same of
+experimentalists. Experimentalists will invariably use different number
+of trials depending on many factors including their access to subject
+pools, their overall goals, and the number of tasks and conditions in
+their experiments. We suspect recommending a standard number of trials
+per experiment will be unsuccessful.
+
+The solution to portability that we develop here is the implementation
+of hierarchical statistical models to \enquote{correct} measurements for
+trial-by-trial noise. In our case, where theoretical targets are sizes
+of effects within tasks and correlations of these effects across tasks,
+noise from finite trials serves as a nuisance. Researchers are most
+interested in measurement of individuals' \emph{true} scores, that is,
+the measurement of individuals' true flanker-effect and Stroop-effect
+scores, and the true correlation between them. While individuals perform
+finite trials, we may use statistical models to query what may
+reasonably happen in the limit. And estimates of effect sizes and
+correlations in the large-sample limit become portable estimates of
+effect sizes and correlations.
+
+Trial-noise-free estimates may be made with a hierarchical linear model
+that accounts for trial-by-trial variation and individual variation
+simultaneously. The application of hierarchical models to trial-by-trial
+performance data in experimental tasks is not new. Previous applications
+in individual-differences research include Schmiedek, Oberauer, Wilhelm,
+Süß, and Wittmann (2007) and Voelkle, Brose, Schmiedek, and Lindenberger
+(2014). Moreover, trial-by-trial hierarchical modeling is well known in
+cognitive psychology (Lee \& Webb, 2005; Rouder \& Lu, 2005) and
+linguistics (Baayen, Tweedie, \& Schreuder, 2002). That said, to our
+knowledge, using hierarchical models to address the low-correlation
+mystery and to make classical test-theory concepts portable in
+experimental settings is novel.
+
+Practitioners of classical test theory sometimes account for
+trial-by-trial noise by treating it as measurement error. The goal is to
+calculate this measurement error and then subtract it out. A good
+example comes from Spearman (1904a), who describes how correlations may
+be corrected for attenuation from measurement error (see
+\url{https://en.wikipedia.org/wiki/Correction_for_attenuation}). We find
+that our hierarchical model estimates agree with these corrections, but
+the models offer a deeper understanding of the statistical and
+theoretical dynamics at play.
+
+In the next section we provide a fairly formal exposition of the model.
+We use an equation-based rather than graphical presentation of the model
+because it is from the equations that the main results flow. Using the
+equations, we derive an expression for the sample effects and show how
+the values are attenuated by trial variability. In the following
+section, we do the same for sample correlation between two tasks, and
+again show how the values are attenuated by trial noise. We show how and
+why the hierarchical model provides for unattenuated estimates.
 
 \subsection{Model specification}\label{model-specification}
 
-The following univariate notation is used: Subscripts are used to denote
-individuals, tasks, conditions, and replicates. Let \(Y_{ijk\ell}\)
-denote the \(\ell\)th observation for the \(i\)th individual in the
-\(j\)th task and \(k\)th condition. Observations are usually performance
-variables, and in our case, and for concreteness, they can be response
-times on trials. For now, we model response times in just one task, and
-in this case, the subscript \(j\) may be omitted. Consider a trial-level
-base model: \[
+Understanding what the model is and how it works relies on some basic
+notion. Let \(I\) be the number of people, \(J\) be the number of tasks,
+\(K\) be the number of conditions, and \(L\) be the number of trials per
+person per task per condition, or the number of replicates. Subscripts
+are used to denote individuals, tasks, conditions, and replicates. Let
+\(Y_{ijk\ell}\) denote the \(\ell\)th observation,
+\(\ell = 1, \ldots, L\) for the \(i\)th individual, \(i = 1, \ldots, I\)
+in the \(j\)th task, \(j = 1, \ldots, J\) and \(k\)th condition,
+\(k = 1, 2\). Observations are usually performance variables, and in our
+case, and for concreteness, they can be response times on trials. For
+now, we model response times in just one task, and in this case, the
+subscript \(j\) may be omitted. Consider a trial-level base model: \[
 Y_{ik\ell} \sim \mbox{Normal}(\mu_{ik},\sigma^2),
 \] where \(\mu_{ik}\) is the true mean response time of the \(i\)th
 person in the \(k\)th condition and \(\sigma^2\) is the true
-trial-by-trial variability. It is important to differentiate between
-true parameter values like \(\mu_{ik}\) and their sample estimates.
+trial-by-trial variability.
 
-We develop this model for the Stroop task. In this task and tasks like
-it, the key contrast is between the congruent (\(k=1\)) and incongruent
-(\(k=2\)) conditions. This contrast is embedded in a model where each
-individual has an average speed effect, denoted \(\alpha_i\), and a
-Stroop effect, denoted \(\theta_i\): \[
+It is important to differentiate between true parameter values like
+\(\mu_{ik}\) and their sample estimates.
+
+We develop this model for the Stroop task. In this task, the key
+contrast is between the congruent (\(k=1\)) and incongruent (\(k=2\))
+conditions. This contrast is embedded in a model where each individual
+has an average speed effect, denoted \(\alpha_i\), and a Stroop effect,
+denoted \(\theta_i\): \[
 Y_{ik\ell} \sim \mbox{Normal}(\alpha_{i}+x_k\theta_{i},\sigma^2),
-\] where \(x_1=-1/2\) and \(x_2=1/2\).
+\] where \(x_1=-1/2\) for the congruent condition and \(x_2=1/2\) for
+the incongruent condition.
 
 The goal then is to study \(\theta_i\), the \(i\)th person's Stroop
-effect size. In modern mixed models, individual's parameters
-\(\alpha_i\) and \(\theta_i\) are considered latent traits for the
-\(i\)th person, and are modeled as random effects: \[
+effect. In modern mixed models, individual's parameters \(\alpha_i\) and
+\(\theta_i\) are considered latent traits for the \(i\)th person, and
+are modeled as random effects: \[
 \begin{aligned}
-\alpha_i &\sim \mbox{Normal}(\mu_\alpha,\sigma^2_\alpha,\\
+\alpha_i &\sim \mbox{Normal}(\mu_\alpha,\sigma^2_\alpha),\\
 \theta_i &\sim \mbox{Normal}(\mu_\theta,\sigma^2_\theta),
 \end{aligned}
 \] where \(\mu_\alpha\) and \(\mu_\theta\) are population means and
 \(\sigma^2_\alpha\) and \(\sigma^2_\theta\) are population variances.
 
-The above mixed model is simple and it may be implemented in frequentist
-or Bayesian frameworks. We use the Bayesian framework here because we
-are more comfortable with the intellectual commitments made in Bayesian
-probability than in frequentist probability (see, for example, Edwards,
-Lindman, \& Savage, 1963). For estimation, the choice of framework
-hardly matters, and the resulting analyses are by-and-large the same
-regardless of how one implements them. The key feature here is the
-hierarchical or mixed nature of the model. This feature is critical for
-gaining portability, and the portability from the hierarchical
-specification holds in both Bayesian and frequentist contexts.\footnote{The
-  full Bayesian specification of the model comes from Haaf \& Rouder
-  (2017) and is as follows. Let \(g_\alpha=\sigma^2_\alpha/\sigma^2\)
-  and \(g_\theta=\sigma^2_\theta/\sigma^2\). Then: \[
-  \begin{aligned}
-  \pi(\mu_\alpha,\sigma^2) &\propto 1/\sigma^2,\\
-  \mu_\theta & \sim \mbox{Normal}(0,g_{\mu_\theta}\sigma^2),\\
-  g_\alpha & \sim \mbox{inverse-$\chi^2$}(1,r^2_\alpha),\\
-  g_\theta & \sim \mbox{inverse-$\chi^2$}(1,r^2_\theta),\\
-  g_{\mu_\theta} & \sim \mbox{inverse-$\chi^2$}(1,r^2_{\mu_\theta}),
-  \end{aligned}
-  \] where inverse-\(\chi^2\)(a,b) is a scaled inverse chi-squared
-  distribution with \(a\) degrees-of-freedom and a scale of \(b\) (see
-  Gelman, Carlin, Stern, \& Rubin, 2004). The following settings are
-  used \(r_\alpha=\) 1, \(r_{\mu_\theta}=\) 0.25, and \(r_\theta=\)
-  0.17. The prior settings have only marginal effects on parameter
-  estimates as the priors are relatively diffuse and the data are
-  numerous.}
-
 \subsection{Hierarchical Regularization and the Portability of Effect
 Size}\label{hierarchical-regularization-and-the-portability-of-effect-size}
 
-The conventional analysis of the Stroop task centers on sample means
-aggregated over trials. The critical quantity is
+Even before applying the model, a bit of analysis shows the flaws in
+conventional analysis and the expected improvements from hierarchical
+modeling. The conventional analysis of the Stroop task centers on sample
+means aggregated over trials. The critical quantity is
 \(d_i=\bar{Y}_{i2}-\bar{Y}_{i1}\), the observed Stroop effect for the
-\(i\)th individual. How does \(d_i\) compare to model-based estimates of
-effects, \(\theta_i\)? Figure~\ref{fig:oneBlockEst} shows the comparison
-for a subset of Stroop data in Hedge et al. (2018). We see that the
-Bayesian estimates are smoother and far less variable than sample means.
-This is an example of the benefits of regularization from hierarchical
-models (Efron \& Morris, 1977), and they hold broadly (Gelman et al.,
-2004; Lehmann \& Casella, 1998).
+\(i\)th individual. It is helpful to express the distribution of sample
+effects, \(d_i\) in model parameters:\footnote{To derive this
+  distribution, note that
+  \(\bar{Y}_{i1}|\alpha_i,\theta_i \sim \mbox{Normal}(\alpha_{i}-\theta_{i}/2,\sigma^2/L)\)
+  and
+  \(\bar{Y}_{i2}|\alpha_i,\theta_i \sim \mbox{Normal}(\alpha_{i}+\theta_{i}/2,\sigma^2/L)\).
+  These random variables are \emph{conditionally independent}. Hence,
+  the mean and variance come about from summing. Therefore
+  \((\bar{Y}_{i2}-\bar{Y}_{i1})|\alpha_i,\theta_i \sim \mbox{Normal}(\theta_i,2\sigma^2/L)\).
+  Marginalizing over \(\theta_i\) yields the distribution.} \[
+d_i \sim \mbox{Normal}(\mu_\theta, 2\sigma^2/L + \sigma^2_\theta),
+\] where \(L\) is the number of trials per individual per condition. The
+term \(2\sigma^2/L\) corresponds to variability from trial-by-trial
+noise and \(\sigma^2_\theta\) corresponds to variability of individuals'
+effects. A classical effect size measure,
+\(\mbox{mean}(d)/\mbox{sd}(d)\), therefore estimates
+\(\mu_\theta/\sqrt{2\sigma^2/L + \sigma^2_\theta}\). The problem is the
+inclusion of \(2\sigma^2/L\), the nuisance trial-by-trial variation.
+This included nuisance trial variation results in individual effect
+estimates that are too variable and in effect size measures that are too
+small. More importantly, portability is violated as there is an explicit
+dependence on \(L\), the number of trials. In the model-based approach,
+the critical parameter is \(\theta_i\), and its distribution is: \[
+\theta_i \sim \mbox{Normal}(\mu_\theta,\sigma^2_\theta),
+\] The effect size calculated from these individual effects is an
+estimate of \(\mu_\theta/\sigma_\theta\), a portable quantity.
+
+It is now clear what aggregation and the hierarchical model do.
+Aggregation is a way of getting at the true values, but only in the
+large-trial limit (as \(L\to\infty\)). In this limit, the term
+\(2\sigma^2/L\) becomes vanishingly small. The hierarchical model
+provides an estimate of the same quantity, but it estimates the correct
+quantity even with finite trials! By using it, results are portable to
+designs with varying numbers of individuals and trials per individual.
+These results are estimates of underlying, theoretically useful
+properties of tasks.
+
+How does \(d_i\) compare to model-based estimates of effects,
+\(\theta_i\)? The hierarchical model is an example of a linear mixed
+model, and as such, may be implemented in a variety of packages
+including \texttt{SAS\ PROC\ MIXED}, \texttt{lmer}, \texttt{lavaan},
+\texttt{Mplus}, \texttt{stan}, and \texttt{JAGS}. In the Appendix, we
+complete specification of the model as a hierarchical Bayesian model and
+use the \texttt{R}-package \texttt{BayesFactor} for analysis. We have
+also made our analysis code available at
+\url{https://github.com/PerceptionAndCognitionLab/ctx-reliability}.
+
+Figure~\ref{fig:oneBlockEst}A and B shows the comparison for a single
+block of Stroop data in Hedge et al. (2018). In this block there are
+about \(L=42\) trials per individual per condition. There are two
+panels---one for sample effects (\(d_i\)), and one for model-based
+estimates of \(\theta_i\). Participants are ordered from the ones that
+show the smallest Stroop effect to the ones that show the largest. In
+the left panel, the solid line shows the sample effect for each
+participant. The shaded area is the extent of each individual's 95\%
+confidence interval. In the right panel, the solid line shows the point
+estimate of \(\theta_i\) and the shaded area is the analogous 95\%
+credible interval. The three horizontal lines are the mean (solid) and
+one standard deviation markers (dashed).
 
 \begin{figure}[htbp]
 \centering
 \includegraphics{p_files/figure-latex/oneBlockEst-1.pdf}
-\caption{\label{fig:oneBlockEst}Estimates of individual's Stroop effect from
-one block of data. The estimates that have greater variability are
-sample effects; the smoothed estimates are from the hierarchical model.}
+\caption{\label{fig:oneBlockEst}Analysis of a single A. Sample effects from
+one block of data for all individuals with 95\% CIs. B. Model estimates
+from one block of data for all individuals with 95\% credible intervals.
+C. Hierarchical shrinkage in practice. The bottom row shows sample
+estimates from one block; the middle row shows the same from the
+hierarchical model; the top row shows sample estimates from all the
+blocks. The shrinkage from the hierarchical model attenuates the
+variability so that it matches that from much larger samples.}
 \end{figure}
 
-Just because the model-based estimates are smoother and there is less
-individual variation doesn't mean they are better. The better estimates
-are the ones closer to the true latent values! Here, we follow the
-demonstration of Efron \& Morris (1977), a delightful paper that
-illustrated the gain in accuracy with regularization from hierarchical
-models. Efron \& Morris (1977) is written for a general audience, and
-the goal was to predict the baseball hitting averages of select players
-using their first 50 at bats. In one case, Efron and Morris used the
-observed proportion of hits after 50 at bats, in the other they used a
-hierarchical model similar to ours above. They found that the
-hierarchical model substantially outperformed the observed-proportion
-approach in predicting the end-of-season batting average for each
-player.
+Although the grand mean effect is about the same for model estimates and
+sample effects, individuals' effects are different. The sample effects
+are spread out further from the grand mean than are the model estimates.
+This increased spread is expected and, as discussed above, comes about
+because the variability of \(d_i\) is the sum of true across-individual
+variation (\(\sigma^2_\theta\)) and trial-by-trial variation
+(\(2\sigma^2/L\)). The spread of model based estimates, in contrast,
+reflects true individual variation alone. This reduction of variability
+in hierarchical models is known as \emph{shrinkage} or
+\emph{regularization} (Efron \& Morris, 1977). Regularization of
+estimates is a well-known property of hierarchical models, and
+regularized estimates are often more accurate than sample statistics
+(Lehmann \& Casella, 1998).
 
-We can do the same with Hedge et al.'s Stroop data. The estimates in
-Figure~\ref{fig:oneBlockEst} were from a single block of 144 trials per
-participant. Hedge et al. ran 10 such blocks distributed across two
-sessions, and we may ask how well the estimates from one of the blocks
-predict the whole 10-block set. Figure~\ref{fig:efron}, the style of
-which is borrowed from Efron and Morris, shows the sample estimates from
-one block (bottom row), the regularized model estimates from the same
-block (middle row), and the sample estimates from all ten blocks (top
-row). The shrinkage toward the grand mean in hierarchical models is
-evident, and it is about right to bring the variability of the
-model-based estimates from one block in line with that from all ten
-blocks.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics{p_files/figure-latex/efron-1.pdf}
-\caption{\label{fig:efron}A comparison of estimates from one block to the
-those from all blocks shows the benefits of hierarchical regularization.
-The bottom row shows sample estimates from one block; the middle row
-shows the same from the hierarchical model; the top row shows sample
-estimates from all the blocks. The shrinkage from the hierarchical model
-attenuates the variability so that it matches that from much larger
-samples.}
-\end{figure}
+Because the benefits of regularization remain opaque in many
+hierarchical applications in cognitive psychology, we explore them in a
+bit more depth here. The estimates in Figure~\ref{fig:oneBlockEst}B were
+from a single block. Hedge et al. ran 10 such blocks distributed across
+two sessions, and we may ask how well the estimates from one of the
+blocks predict the whole 10-block set. The 10-block set consists of over
+400 trials per person and condition. Figure~\ref{fig:oneBlockEst}C, the
+style of which is borrowed from Efron and Morris (1977), shows the
+sample estimates from one block (bottom row), the regularized model
+estimates from the same block (middle row), and the sample estimates
+from all ten blocks (top row). The shrinkage toward the grand mean in
+hierarchical models is evident, and it brings the variability of the
+model-based estimates from one block in line with the variability from
+all ten blocks.
 
 The model-based one-block estimators are better predictors of the
 overall data than are the sample one-block estimators. This improvement
 may be formalized by a root-mean-squared error measure. The error is
-about 1.60 times larger for the sample means than for the hierarchical
+about 1.62 times larger for the sample means than for the hierarchical
 model estimates. This benefit is general---hierarchical models provide
-for more accurate estimates of individuals latent abilities (James \&
+for more accurate estimates of individuals' latent abilities (James \&
 Stein, 1961).
-
-Figure~\ref{fig:efron} provides insight into the importability of sample
-effect size measures. The problem here is that the variability of
-individual sample effects are too large. That means the standard
-deviation estimate is too large, and the resulting effect-size estimates
-are too small. The model based estimates are regularized so that the
-scale of individual effects is about right. Hence, the effect size
-estimate is not systematically biased.
-
-We can formalize the dynamics in play. It is helpful to express the
-distribution of sample effects, \(d_i\) in model parameters. \[
-d_i \sim \mbox{Normal}(\mu_\theta,2\sigma^2/L + \sigma^2_\theta).
-\] Classical effect size measure, \(\mbox{mean}(d)/\mbox{sd}(d)\), are
-measuring \(\mu_\theta/\sqrt{2\sigma^2/L + \sigma^2_\theta}\). The
-problem is the inclusion of \(2\sigma^2/L\), which is nuisance trial
-variation. Not only does this included nuisance trial variation result
-in individual effect estimates that are too variable and in effect size
-measures that are too small, it violates portability as there is an
-explicit dependence on \(L\), a sample-size measure. In the model-based
-approach, the distribution of \(\theta_i\) is: \[
-\theta_i \sim \mbox{Normal}(\mu_\theta,\sigma^2_\theta),
-\] and the effect size calculated from these individual effects are the
-correct, portable, quantity.
-
-It is now clear what the hierarchical model does---it accounts for
-trial-by-trial variation. By doing so, results are portable to designs
-with varying numbers of individuals and trials per individual. These
-results are estimates of underlying properties of tasks.
 
 \section{A Two-Task Model for Reliability and
 Correlation}\label{a-two-task-model-for-reliability-and-correlation}
 
-The hierarchical model may be expanded to account for two tasks or two
-session simultaneously. For two sessions, the goal is to estimate a
-portable measure of test-retest reliability; for two tasks, the goal is
-to measure a portable estimate of correlation. Let's take reliability
-first. The Hedge et al. data set, which we highlight here, has a novel
-feature. These researchers sought to measure the test re-test
-reliability of several cognitive tasks. They had individuals perform 720
-trials of a task one day, and three weeks later the individuals returned
-and performed another 720 trials. We let the subscript \(j=1,2\) index
-the session. The trial-level model is expanded to: \[
+The hierarchical model may be expanded from accounting for only one task
+to account for two tasks or two sessions simultaneously. For two
+sessions, the goal is to estimate a portable measure of test-retest
+reliability; for two tasks, the goal is to measure a portable estimate
+of correlation. Let's take reliability first. The Hedge et al. data set,
+which we highlight here, has a novel feature. These researchers sought
+to measure the test-retest reliability of several cognitive tasks. They
+had individuals perform 720 trials of a task one day, and three weeks
+later the individuals returned and performed another 720 trials. We let
+the subscript \(j=1,2\) index the session. The trial-level model is
+expanded to: \[
 Y_{ijk\ell} \sim \mbox{Normal}(\alpha_{ij}+x_k\theta_{ij},\sigma^2).
 \] Here, we simply expand the parameters to hold for
 individual-by-session combinations.
 
 The parameters of interest are \(\theta_{ij}\) and there are several
 specifications that may be made here. We start with the most general of
-these, an additive-components decomposition into common and oppositional
+these, an additive-components decomposition into common and opposite
 components: \[
 \begin{aligned}
 \theta_{i1} &= \nu_1 + \omega_i - \gamma_i,\\
@@ -643,21 +671,19 @@ Stroop effect. The parameter \(\omega_i\) is the common effect of the
 sessions have high values of \(\omega\). The parameter, \(\gamma_i\), is
 the oppositional component. It captures idiosyncratic deviations where
 one individual may have a large Stroop effect in one session and a
-smaller one in another. Whereas these individual common effects and
-oppositional effects are random effects, we place a hierarchical
-constraint on them: \[
+smaller one in another. These individual common effects and oppositional
+effects are random effects, and we place a hierarchical constraint on
+them: \[
 \begin{aligned}
 \omega_i &\sim \mbox{Normal}(0,\sigma^2_\omega),\\
 \gamma_i &\sim \mbox{Normal}(0,\sigma^2_\gamma).
 \end{aligned}
 \]
 
-In the previous section, we constructed portable measures by focusing on
-the distribution of \(\theta\), individuals' true effects. Here we do
-the same. To gain an expression for the reliability of a task, it is
+To gain an expression for the correlation among two sessions, it is
 helpful to express the multivariate distribution of the \(\theta\)s. The
 easiest way to do this is to write out the distribution for two
-individuals' performance across two sessions: \[
+individuals' effects across two sessions: \[
 \begin{bmatrix} \theta_{11} \\ \theta_{12} \\ \theta_{21} \\ \theta_{22} \end{bmatrix}
 \sim \mbox{N}_4\left(
 \begin{bmatrix} \nu_1 \\ \nu_2 \\ \nu_1 \\ \nu_2 \end{bmatrix},
@@ -672,12 +698,11 @@ individuals' performance across two sessions: \[
 reliability, the correlation across \(\theta_{i1}\) and \(\theta_{i2}\),
 is \[
 \rho = \frac{\sigma^2_\omega-\sigma^2_\gamma}{\sigma^2_\omega+\sigma^2_\gamma}
-\] Importantly, this reliability is portable as it does not include
+\] Importantly, this quantity is portable as it does not include
 trial-by-trial variability.
 
-To see where the importability of sample reliability comes from, we
-start with the equivalent multivariate distribution for sample effects:
-\[
+For comparison, we may also express in multivariate distribution for
+sample effects for two individuals in two sessions: \[
 \begin{bmatrix} d_{11} \\ d_{12} \\ d_{21} \\ d_{22} \end{bmatrix}
 \sim \mbox{N}_4\left(
 \begin{bmatrix} \nu_1 \\ \nu_2 \\ \nu_1 \\ \nu_2 \end{bmatrix},
@@ -692,7 +717,7 @@ start with the equivalent multivariate distribution for sample effects:
 between sample effects is estimating
 \((\sigma^2_\omega-\sigma_\gamma)/(\sigma^2_\omega+\sigma^2_\gamma+2\sigma^2/L)\).
 It is the added sample noise in the denominator, \(\sigma^2/L\), that
-renders the sample test-retest reliability importable.
+renders the sample test-retest correlation importable and too small.
 
 \begin{figure}[htbp]
 \centering
@@ -706,91 +731,126 @@ satisfactorily high values.}
 \end{figure}
 
 Figure~\ref{fig:reliability} provides a real-data comparison of
-model-based and sample test-retest reliabilities. The top row is for the
-single block of Hedge et al.'s Stroop task; the bottom row is for all
-ten blocks of the same data set. The first column are scatter plots of
-the sample effects of the first session vs.~the second session. There is
-almost no test-retest correlation using a single block of data (A); but
-when all data are considered there is a moderate correlation (B). This
-pattern is the same as in Figure~\ref{fig:portability} where reliability
-was diminished for smaller numbers of trials. The model estimates of
-individual effects are shown in the middle column. Here, there is
-shrinkage, especially for the single block (C,D). This shrinkage,
-however, is to a line rather than to a point in the center. This pattern
-reflects the model specification where positive and negative
-correlations are explicitly modeled. The last column shows the posterior
-distributions of the test-retest reliability coefficient. Here, for the
-single-block data there is much uncertainty (E). The uncertainty shrinks
-as the sample sizes grow, as indicated by the same plot for all the data
-(F). The posterior mean, a point-estimate for the test-retest
-reliability of the Stroop task, is 0.72. We also analyzed the flanker
-task, and the test-retest reliability of this this task is 0.68. With
-these relatively reasonable levels of reliability, there is sufficient
-resolution to explore the correlation across the two tasks.
+model-based and sample correlations. The top row is for the single block
+of Hedge et al.'s Stroop task; the bottom row is for all ten blocks of
+the same data set. The first column are scatter plots of the sample
+effects of the first session vs.~the second session. There is almost no
+test-retest correlation using a single block of data (A); but when all
+data are considered there is a moderate correlation (B). This pattern is
+the same as in Figure~\ref{fig:portability} where reliability was
+diminished for smaller numbers of trials. The model estimates of
+individual effects are shown in the middle column (C, D). Here, there is
+shrinkage, especially for the single block (C). This shrinkage, however,
+is to a line rather than to a point in the center. This pattern reflects
+the model specification where positive and negative correlations are
+explicitly modeled. The last column shows the posterior distributions of
+the test-retest reliability coefficient. Here, for the single-block data
+there is much uncertainty (E). The uncertainty shrinks as the sample
+sizes grow, as indicated by the same plot for all the data (F). The
+posterior mean, a point-estimate for the test-retest reliability of the
+Stroop task, is 0.72. We also analyzed the flanker task, and the
+test-retest reliability of this this task is 0.68.
 
 Figure~\ref{fig:reliability} highlights the dramatic difference between
 conventional and hierarchical-model analysis, especially for smaller
-numbers of trials per participant. If one uses the conventional model
-for the reliability for one block of data, then the correlation
-coefficient appears small, 0.10, and somewhat well localized (the 95\%
-confidence interval is from-0.17 to 0.36). We emphasize this result is
-misguided. When all the data are used, the conventional correlation
-coefficient is 0.55, which is well outside this 95\% confidence
-interval. Contrast this result to that from the hierarchical model.
-Here, not only is the correlation coefficient larger, 0.31), but the
-uncertainty is quite large as well (the 95\% credible interval is from
--0.31 to 0.80). Moreover, the value of the correlation from the
-hierarchical model with all of the data, 0.72, is within this credible
-interval. In summary, using the conventional analysis results in over
-confidence in a wrong answer. The hierarchical model, however, tempers
-this overconfidence by accounting for trial-by-trial uncertainty as well
-as uncertainty across individuals.
+numbers of trials per participant. If one uses the conventional
+correlation coefficient for one block of data, the resulting value is
+small, 0.10, and somewhat well localized (the 95\% confidence interval
+is from-0.17 to 0.36). We emphasize this result is misguided. When all
+the data are used, the conventional correlation coefficient is 0.55,
+which is well outside this 95\% confidence interval. Contrast this
+result to that from the hierarchical model. Here, not only is the
+correlation coefficient larger, 0.31, but the uncertainty is quite large
+as well (the 95\% credible interval is from -0.32 to 0.82). Moreover,
+the value of the correlation from the hierarchical model with all of the
+data, 0.72, is within this credible interval. In summary, using the
+conventional analysis results in over confidence in a wrong answer. The
+hierarchical model, however, tempers this overconfidence by accounting
+for trial-by-trial uncertainty as well as uncertainty across
+individuals.
+
+The above real-world demonstration that sample estimates of correlations
+are so badly attenuated should be alarming. The one-block case was based
+on a design with 48 trials per individual per condition. This is a
+typical number for individual-difference batteries with a large number
+of tasks. Yet, the attenuation is so severe that test-retest
+correlations are barely detectable. No wonder observed correlations
+across tasks are so low. The hierarchical model provides a more
+sensitive view of the structure in the data by allowing for shrinkage to
+a regression line.
+
+\begin{table}[tbp]
+\begin{center}
+\begin{threeparttable}
+\caption{\label{tab:corTab}Test-retest correlations for Hedge et al (2018) data sets.}
+\begin{tabular}{llll}
+\toprule
+ & \multicolumn{1}{c}{Sample} & \multicolumn{1}{c}{Model} & \multicolumn{1}{c}{\thead{Corrected for \\ Attenuation}}\\
+\midrule
+Stroop, one block & 0.10 & 0.31 & 0.31\\
+Stroop, full set & 0.55 & 0.72 & 0.74\\
+Flanker, one block & 0.23 & 0.49 & 0.52\\
+Flanker, full set & 0.50 & 0.68 & 0.71\\
+\bottomrule
+\end{tabular}
+\end{threeparttable}
+\end{center}
+\end{table}
+
+The attenuation of correlation from measurement error is well known in
+classical test theory and one approach is to apply a correction formula.
+The basic idea underlies the Spearman-Brown prophecy formula and the
+Spearman formula for disattenuation of correlations (Spearman, 1904b).
+We used the latter to compute an adjusted test-retest correlations for
+both tasks and for both the one-block and full data sets. The results
+are in Table~\ref{tab:corTab}, and there is a high degree of concordance
+for the model correlations and the corrected correlation. This overall
+concordance is expected as the correction for attenuation and the
+hierarchical models share the same foundational assumption about noise.
 
 Correlation between tasks may be handled with the same machinery. Here
 we compare Stroop task performance to flanker task performance. Each of
-Hedge et al's participants ran in both tasks. To correlate tasks, we
-combined data across sessions and fit the model where \(j\) indexes task
-rather than session. The results are shown in Figure~\ref{fig:combo}. As
-can be seen, there appears to be no correlation. Inference about the
-lack of correlation will be made in the next section where model
-comparison is discussed.
+Hedge et al's participants participated in both tasks. To correlate
+tasks, we combined data across sessions and fit the model where \(j\)
+indexes task rather than session. The results are shown in
+Figure~\ref{fig:combo}. As can be seen, there appears to be no
+correlation. Inference about the lack of correlation will be made in the
+next section where model comparison is discussed.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics{p_files/figure-latex/combo-1.pdf}
 \caption{\label{fig:combo}The lack of correlation between flanker task and
-Stroop task performance. Left: Scatter plot of individuals. Right:
-Posterior distribution of the correlation coefficient.}
+Stroop task performance. Left: Scatter plot of individuals' model-based
+estimates. Right: Posterior distribution of the correlation
+coefficient.}
 \end{figure}
 
 \section{Model Comparison}\label{model-comparison}
 
-The above analyses were focused on parameter estimation. With
-estimation, the targets are the effect sizes and reliability of tasks,
-and the correlation among tasks. Model-based estimation provided here
-are portable analogs to sample-based measures of effect size,
-reliability, and correlation. The difference is that they account for
-variation at the trial level, and consequently, may be ported to designs
-with varying sample sizes.
+The above analyses were focused on parameter estimation. Model-based
+estimation provided here are portable analogs to sample-based measures
+of effect size, reliability, and correlation. The difference is that
+they account for variation at the trial level, and consequently, may be
+ported to designs with varying numbers of trials.
 
 Researchers, however, are often interested in stating evidence for
 theoretically meaningful propositions. In the next section, we describe
 a set of theoretically meaningful propositions and their model
-implementation. Following this, we present a Bayes factor method of
+implementation. Following this, we present a Bayes factor method for
 model comparison.
 
 \subsection{Theoretical Positions and Model
 Implementation}\label{theoretical-positions-and-model-implementation}
 
 When assessing the relationship between two tasks, the main target is
-the correlation. The above estimation model is helpful for estimating
-the correlation, but often researchers are interested in the following
-statements: The first one is about a lack of correlation among two
-tasks. A lack of correlation is a necessary condition for independence,
-and if there is evidence for a lack of correlation, then independence is
-plausible. The state is full correlation among the tasks. If there is
-full correlation, then there is evidence that both tasks are measuring a
-single dimension or ability.
+the true latent correlation in the large-trial limit. There are two
+opposing theoretically important positions: 1. that there is no
+correlation; and 2. there is full correlation. A lack of true
+correlation indicates that the two tasks are measuring independent
+psychological processes or abilities. Likewise, if there is full
+correlation, then the two tasks are measuring the same psychological
+processes or abilities.
 
 In the preceding section, we presented an estimation model, which we now
 call the \emph{general model}. The critical specification is that of
@@ -804,8 +864,8 @@ call the \emph{general model}. The critical specification is that of
 among an individuals reflects the variability of \(\omega\) and
 \(\gamma\). All values of correlation on the open interval (-1,1) are
 possible. Full correlation is not possible, and there is no special
-credence given to no correlation. To represent those positions we
-develop alternative models on \(\theta{ij}\).
+credence given to no correlation. To represent the two theoretical
+positions we develop alternative models on \(\theta{ij}\).
 
 A no-correlation model is given by putting uncorrelated noise on
 \(\theta_{ij}\): \[
@@ -825,43 +885,17 @@ parameters in the general model. \[
 \calM_1: \quad & \theta_{ij}=\nu_j+\omega_i,\\
 & \omega_i \sim \mbox{Normal}(0,\sigma^2_\theta)
 \end{aligned}
-\] Here, there is a single random parameter, \(\omega_i\) for both
-tasks.
+\] Here, there is a single random parameter, \(\omega_i\), for both
+tasks per individual. In the full-correlation model, regularization is
+to a line with a slope of 1.0.
 
-Before continuing to model comparison, a more in-depth consideration of
-priors on parameters is needed. In Bayesian analysis, priors are needed
-for all parameters. In the preceding sections, we de-emphasized the role
-of the prior. For estimating parameters, the influence of the priors
-quickly diminishes with increasing sample sizes (Lee, 1997). In our
-context, we had a large number of observations, and the reported
-estimates are very robust to large changes in prior settings. For model
-comparison, however, the story changes markedly. Priors play a critical
-role and must be set judiciously. In the Appendix, under the section on
-Prior Specification, we discuss the role of prior settings and justify
-our choices. We encourage all readers to read the Appendix though it is
-not necessary to continue.
+\subsection{Bayes Factor Analysis}\label{bayes-factor-analysis}
 
-\subsection{Bayes Factor}\label{bayes-factor}
-
-In Bayesian analysis, it is possible to use Bayes' rule to update
-beliefs about the plausibility of models themselves. Let \(\calM_a\) and
-\(\calM_b\) be two models under consideration and let \(\bfY\) denote a
-collection of observations. The relevant equation is: \[
-\frac{P(\calM_a|\bfY)}{P(\calM_b|\bfY)} = \frac{P(\bfY|\calM_a)}{P(\bfY|\calM_b)} \times \frac{P(\calM_a)}{P(\calM_b)}.
-\] Here \({P(\calM_a|\bfY)}/{P(\calM_b|\bfY)}\) are the posterior odds
-on the models; \(P(\calM_a)/P(\calM_b)\) are the prior odds, and
-\(P(\bfY|\calM_a)/P(\bfY|\calM_b)\) is the Bayes factor. This factor
-describes how odds should be updated in light of data. A growing chorus
-of psychologists and statisticians argue that the Bayes factor is ideal
-for scientific communication because it is the updating factor
-regardless of whatever prior odds are held (Edwards et al., 1963;
-Jeffreys, 1961; Myung \& Pitt, 1997; Wagenmakers, 2007). The Bayes
-factor may also be thought of as describing how well the model predicts
-the observed data (Morey, Romeijn, \& Rouder, 2016; Rouder, Haaf, \&
-Aust, 2018; Rouder, Morey, \& Wagenmakers, 2016). Models in the Bayesian
-context provide a predictive probability distribution across the data,
-that is, they describe where the data should lie before seeing them.
-Then, we assess how well each model predicted the observed data.
+We use the Bayes factor (Edwards, Lindman, \& Savage, 1963; Jeffreys,
+1961) to measure the strength of evidence for the three models. The
+Bayes factor is the probability of the observed data under one model
+relative to the probability of the observed data under a competitor
+model.
 
 \begin{table}[tbp]
 \begin{center}
@@ -885,25 +919,25 @@ High Correlation & 1-to-31 & 1-to-1.03$\times 10^{5}$ & 1-to-1\\
 \end{center}
 \end{table}
 
-Table~\ref{tab:bftab} shows the Bayes factor results for a few data sets
-from Hedge et al. (2018). The top two rows are for the Stroop and
-flanker data, and the correlation being tested is the test-retest
-reliability. The posterior mean of the correlation coefficients are 0.72
-and 0.68, for the Stroop and flanker tasks, respectively. The Bayes
-factors confirm that there is ample evidence that the correlation is
-neither null nor full. Hence, we may conclude that there is indeed some
-though not a lot of added variability between the first and second
-sessions in these tasks. The next row shows the correlation between the
-two tasks. Here, the posterior mean of the correlation coefficient is
--0.06 and the Bayes factors confirm that the no-correlation model is
-preferred. The final row is a demonstration of the utility of the
-approach for finding dimension reductions. Here, we split the flanker
-task data in half by odd and even trials rather than by sessions. We
-then submitted these two sets to the model, and calculated the
-correlation. It was quite high of course, and the posterior mean of the
-correlation was 0.82. The Bayes factor analysis concurred, and the
-full-correlation model was favored by 31-to-1 over the general model,
-the nearest competitor.
+Table~\ref{tab:bftab} shows the Bayes factor results for the Stroop and
+flanker task data sets from Hedge et al. (2018). The top two rows are
+for the Stroop and flanker data, and the correlation being tested is the
+test-retest reliability. The posterior mean of the correlation
+coefficients are 0.72 and 0.68, for the Stroop and flanker tasks,
+respectively. The Bayes factors confirm that there is ample evidence
+that the correlation is neither null nor full. Hence, we may conclude
+that there is indeed some though not a lot of added variability between
+the first and second sessions in these tasks. The next row shows the
+correlation between the two tasks. Here, the posterior mean of the
+correlation coefficient is -0.06 and the Bayes factors confirm that the
+no-correlation model is preferred. The final row is a demonstration of
+the utility of the approach for finding dimension reductions. Here, we
+split the flanker task data in half by odd and even trials rather than
+by sessions. We then submitted these two sets to the model, and
+calculated the correlation. It was quite high of course, and the
+posterior mean of the correlation was 0.82. The Bayes factor analysis
+concurred, and the full-correlation model was favored by 31-to-1 over
+the general model, the nearest competitor.
 
 The Appendix provides the prior settings for the above analyses. It also
 provides a series of alternative settings for assessing how sensitive
@@ -917,16 +951,18 @@ they support.
 \section{General Discussion}\label{general-discussion}
 
 In this paper we examined classical test theory analysis of experimental
-tasks. In the classical-test-theory framework, conventional sample
-measures are not portable because they are estimating quantities
-contaminated by removable trial-by-trial variation. With this
-contamination, effect sizes reliabilities, and correlations are
-dramatically too low. The main innovation here is modeling
-trial-by-trial variation along with individuals' covariation across
-tasks. Concepts such as effect size, reliability, and correlation are
-portable when defined in the asymptotic limit of unbounded trials per
-individual. In the current models, performance in these asymptotic
-limits are explicit model parameters.
+tasks. The main difficulty in classical analysis occurs when researchers
+aggregate across trials to form individual-by-task scores. We recommend
+that researchers avoid this aggregation. If aggregated scores are used
+as input, then conventional sample measures are not interpretable
+without correction because they estimate quantities contaminated by
+removable trial-by-trial variation. With this contamination, effect
+sizes, reliabilities, and correlations are too low, sometimes
+dramatically so. We advocate applying hierarchical models to the trial
+level to remove trial-by-trial variation. Concepts such as effect size,
+reliability, and correlation are portable when defined in the asymptotic
+limit of unbounded trials per individual. In the current models,
+performance in these asymptotic limits are explicit model parameters.
 
 With this development, it is possible to assess whether observed low
 correlations across tasks reflect low reliability or a true lack of
@@ -936,50 +972,35 @@ high test-retest reliability for both tasks. This high reliability
 allows for the interpretation of the correlation between Stroop and
 flanker tasks. There is direct evidence for a null correlation.
 
-The main difficulty in classical analysis occurs when researchers
-aggregate across trials to form individual-by-task scores. We recommend
-that researcher avoid this aggregation. Instead, they should extend
-hierarchical models to the trial level, and by doing so, classical
-concepts of reliability, effect size, and correlation remain meaningful
-and portable. Individual-difference researchers are intimately familiar
-with mixed linear models, and these are used regularly to decompose
-variability. Adding one additional level, the trial level, is
-conceptually trivial and computationally straightforward. Indeed,
-modeling at this level is common in high-stakes testing (IRT, Lord \&
-Novick, 1968), cognition (Lee \& Webb, 2005; Rouder \& Lu, 2005), and
-linguistics (Baayen et al., 2002).
+Individual-difference researchers are intimately familiar with mixed
+linear models, and these are used regularly to decompose variability.
+Adding one additional level, the trial level, is conceptually trivial
+and computationally straightforward. Indeed, modeling at this level is
+common in high-stakes testing (IRT, Lord \& Novick, 1968), cognition
+(Lee \& Webb, 2005; Rouder \& Lu, 2005), and linguistics (Baayen et al.,
+2002). In the Appendix, we show how the \texttt{nWayAOV} function in the
+\texttt{BayesFactor} package may be used for implementation.
 
-\subsection{Bayesian Modeling}\label{bayesian-modeling}
+\subsection{Models vs.~Corrections}\label{models-vs.corrections}
 
-The models presented here are simple hierarchical models, and
-consequently, they may be analyzed in conventional or Bayesian
-frameworks. For parameter estimation, there is often little difference
-between Bayesian approaches and more classical ones. Bayesian approaches
-make latent variable modeling a bit simpler and more conceptually
-straightforward (Gelman et al., 2004), but the regularized estimates
-from hierarchical models behave similarly in both frameworks (Lehmann \&
-Casella, 1998).
-
-The big difference between conventional and Bayesian latent-variable
-modeling, at least for the methods we ascribe to, is in model
-comparison. There are several different Bayesian approaches to model
-comparison. We advocate comparison by Bayes factor, but other approaches
-include using the coverage of credible intervals (Kruschke \& Liddell,
-2017), comparison by deviance information criterion (DIC; Spiegelhalter,
-Best, Carlin, \& Linde, 2002), and comparison through cross validation
-(Vehtari, Gelman, \& Gabry, 2017). The reason we prefer Bayes factor is
-that it follows directly from Bayes' rule (Laplace, 1986) and uniquely
-guarantees rational updating of the plausibility of models in light of
-data (de Finetti, 1974). Other methods necessarily do not update
-rationally. Instead, they meet other desiderata, mostly focused either
-on out-of-sample considerations or minimizing the influence of prior
-settings. The debate among Bayesians about model comparison is certainly
-vigorous and well litigated. As a matter of principle, we advocate Bayes
-factor as a rational updater. Simultaneously, we respect that others may
-invoke alternative desiderata, and we appreciate their critiques. Those
-who use Bayes factor should be prepared to admit a diversity of opinion
-that reflects the range of reasonable prior settings, as we do in the
-Appendix.
+One of the promising results here is that existing corrections for
+measurement noise yield similar results to hierarchical modeling. This
+is not surprising as these corrections are based on the same assumptions
+about noise. Yet, we believe that researchers should invest in modeling
+even though correction formulas are much easier to implement in
+practice. Here is why: First, correction yields a point estimate of the
+true latent value without a sense of uncertainty. Model-based point
+estimates, like the ones presented here, often come with a measure of
+uncertainty. Second, models may be compared to answer questions about
+whether the correlation is zero, one, or intermediary. Corrections offer
+no such inferences. Third, models may be extended to represent more
+complex structure in data. We know of no comparable correction for
+measurement noise in say factor analysis. Fourth, and most importantly,
+modeling provides for a deeper and more nuanced understanding of
+structure in data. Knowing how models represent structure and how data
+influences model-based conclusions allows researchers to add value in
+addressing theoretically-important substantive issues in a way that
+correction procedures cannot.
 
 \subsection{More Advanced Task Models}\label{more-advanced-task-models}
 
@@ -1013,97 +1034,127 @@ covariation across several tasks.
 In the beginning of this paper, we asked if low correlations reflect
 statistical considerations or substantive considerations. The answer
 here, with a large data set, is that there is a substantive claim. We
-state positive evidence for a lack of correlation across Stroop and
-flanker tasks. That said, the better answer to our initial question is
-\enquote{Yes.} Yes, the attenuated correlations have substantive
-meaning, and, yes, there are difficult statistical considerations.
+state evidence for a lack of correlation across Stroop and flanker
+tasks. That said, we should not understate the statistical
+considerations.
 
-We suspect there is far less true individual variability in many tasks
-than has been realized, and apparent variability comes more from the
-trial level than from true individual differences. Consider a typical
-priming task. Trials in these tasks take about 500 ms to complete, and a
-large effect is about 50 ms. If the average is 50 ms, how much could
-individuals truly vary? The answer is \enquote{not that much,}
-especially if we assume that no individual has true negative effects
-(Haaf \& Rouder, 2017; Rouder \& Haaf, 2018). Indeed, we have analyzed
-the observed and true (latent) variation across individuals in many
-tasks (Haaf \& Rouder, 2017, 2018). Observed variation is usually on the
-order of 100s of milliseconds. Yet, once trial-by-trial variation is
-modeled, individuals' true values vary from 10 ms to 40 ms. For such a
-narrow range, accurate understanding of individuals would require
-estimating each individual's effect to within a few milliseconds. Even
-the hierarchical models we advocate cannot mitigate this fact; if there
-is too little resolution then the posterior reliabilities and
-correlations will not be well localized. Obtaining the requisite level
-of resolution requires several hundred trials per individual per
-condition. It may be that these types of small-effect tasks have too
-small a range of individual differences to be useful in
-individual-difference research without large-scale data collection
-efforts.
+We suspect there is less true individual variability in many tasks than
+has been realized, and apparent variability comes more from the trial
+level than from true individual differences. Consider a typical priming
+task. Trials in these tasks take about 500 ms to complete, and a large
+effect is about 50 ms. If the average is 50 ms, how much could
+individuals truly vary? The answer, we believe, is \enquote{not that
+much,} especially if we assume that no individual has true negative
+effects (Haaf \& Rouder, 2017; Rouder \& Haaf, 2018). Indeed, we have
+analyzed the observed and true (latent) variation across individuals in
+several tasks (Haaf \& Rouder, 2017, 2018). Observed variation is
+usually on the order of 100s of milliseconds. Yet, once trial-by-trial
+variation is modeled, individuals' true values vary from 10 ms to 40 ms.
+For such a narrow range, accurate understanding of individuals would
+require estimating each individual's effect to within a few
+milliseconds. Even the hierarchical models we advocate cannot mitigate
+this fact; if there is too little resolution then the posterior
+reliabilities and correlations will not be well localized. Obtaining the
+requisite level of resolution to study individual differences in these
+tasks may requires several hundred trials per individual per condition,
+and perhaps this design choice may prove more critical than collecting
+from hundreds of individuals.
 
 \newpage
 
 \section{Appendix}\label{appendix}
 
+\subsection{Model Specification}\label{model-specification-1}
+
+\subsubsection{The One-Task Model.}\label{the-one-task-model.}
+
+The model of data for a single task is given by: \[
+Y_{ik\ell}|\alpha_i,\theta_i,\sigma^2 \stackrel{\mbox{ind}}{\sim }\mbox{Normal}(\alpha_{i}+x_k\theta_{i},\sigma^2),
+\] where \(i\), \(k\), and \(\ell\) respectively index individual,
+condition, and replicate, and and where \(x_1=-1/2\), and \(x_2=1/2\).
+Models on \(\alpha_i\) and \(\theta_i\) are \[
+\begin{aligned}
+\alpha_i|\mu_\alpha,\sigma^2_\alpha &\stackrel{\mbox{iid}}{\sim} \mbox{Normal}(\mu_\alpha,\sigma^2_\alpha),\\
+\theta_i|\mu_\theta,\sigma^2_\theta &\stackrel{\mbox{iid}}{\sim} \mbox{Normal}(\mu_\theta,\sigma^2_\theta),
+\end{aligned}
+\]
+
+We use a \(g\)-prior specification for variance components (Zellner \&
+Siow, 1980,Zellner (1986)), These priors have become popular for linear
+models {[}Liang, Paulo, Molina, Clyde, and Berger
+(2008),Rouder:etal:2012a{]}. Let \(g_\alpha=\sigma^2_\alpha/\sigma^2\)
+and \(g_\theta=\sigma^2_\theta/\sigma^2\). Then: \[
+\pi(\mu_\alpha,\sigma^2) \propto 1/\sigma^2,
+\] and \[
+\begin{aligned}
+\mu_\theta & \sim \mbox{Normal}(0,g_{\mu_\theta}\sigma^2),\\
+g_\alpha & \sim \mbox{inverse-$\chi^2$}(1,r^2_\alpha),\\
+g_\theta & \sim \mbox{inverse-$\chi^2$}(1,r^2_\theta),\\
+g_{\mu_\theta} & \sim \mbox{inverse-$\chi^2$}(1,r^2_{\mu_\theta}),
+\end{aligned}
+\] where inverse-\(\chi^2\)(a,b) is a scaled inverse chi-squared
+distribution with \(a\) degrees-of-freedom and a scale of \(b\) (see
+Gelman, Carlin, Stern, \& Rubin, 2004). The inverse-\(\chi^2\) prior on
+\(g\) is a popular choice because it is computationally convenient and
+leads to posteriors with desirable objective Bayes properties {[}Berger
+(2006)\href{mailto:;@Liang}{\nolinkurl{;@Liang}}:etal:2008;Rouder:etal:2012{]}.
+
+\subsubsection{The Two-Task Model}\label{the-two-task-model}
+
+The model of data for two task is given by: \[
+Y_{ik\ell}|\alpha_{ij},\theta_{ij},\sigma^2 \stackrel{\mbox{ind}}{\sim }\mbox{Normal}(\alpha_{ij}+x_k\theta_{ij},\sigma^2),
+\] where \(j\) indexes the task. Models on \(\alpha_{ij}\) and
+\(\theta_{ij}\) are \[
+\alpha_{ij} \stackrel{\mbox{iid}}{\sim} \mbox{Normal}(\mu_\alpha,g_\alpha\sigma^2),\]
+and \[
+\begin{aligned}
+\theta_{i1}|\nu_1,\omega_i,\gamma_i &= \nu_1 + \omega_i - \gamma_i,\\
+\theta_{i2}|\nu_2,\omega_i,\gamma_i &= \nu_2 + \omega_i + \gamma_i.
+\end{aligned}
+\] Models on \(\nu_k\), \(\omega_i\) and \(\gamma_i\) are \[
+\begin{aligned}
+\nu_k|g_\nu,\sigma^2 & \stackrel{\mbox{iid}}{\sim}\mbox{Normal}(0,g_\nu\sigma^2)\\
+\omega_i|g_\omega\sigma^2 &\stackrel{\mbox{iid}}{\sim} \mbox{Normal}(0,g_\omega\sigma^2),\\
+\gamma_i|g_\gamma,\sigma^2 &\stackrel{\mbox{iid}}{\sim} \mbox{Normal}(0,g_\gamma\sigma^2).
+\end{aligned}
+\] Priors on \[
+\begin{aligned}
+g_\nu &\sim \mbox{inverse-$\chi^2$}(1,r^2_\nu),\\
+g_\omega &\sim \mbox{inverse-$\chi^2$}(1,r^2_\omega),\\
+g_\gamma &\sim \mbox{inverse-$\chi^2$}(1,r^2_\gamma),
+\end{aligned}
+\]
+
 \subsection{Prior settings}\label{prior-settings}
 
-Priors are needed on models, and the specification of these priors plays
-a critical role in Bayes factor model comparison. Some of the parameters
-are common to all the models under consideration. For Models
-\(\calM_g\), \(\calM_0\), and \(\calM_1\), the common parameters are
-\(\sigma^2\), the collection of all \(\alpha_{ij}\), and the two
-\(\nu_j\). For these parameters, the priors have a marginal effect on
-model comparison so long as they are not overly constraining. Other
-parameters---the ones that define the differences between the
-models---are critical, and their priors must be set judiciously. The
-three models are defined by different specifications of \(\theta_{ij}\),
-and the priors on the related parameters need careful consideration. In
-the general model, these parameters are \(\sigma^2_\omega\) and
-\(\sigma^2_\gamma\). In the zero-correlation and full correlation model,
-the parameters are \(\sigma^2_\theta\) and \(\sigma^2_\omega\),
-respectively. It is popular to express these variabilities as multiples
-of the trial-by-trial variability (Zellner, 1986; Zellner \& Siow,
-1980). Let \(g_\omega=\sigma^2_\omega/\sigma^2\),
-\(g_\gamma=\sigma^2_\gamma/\sigma^2\), and
-\(g_\theta=\sigma^2_\theta/\sigma^2\). Then, priors on the \(g\)
-parameters are often scaled inverse-\(\chi^2\) distributions (Liang,
-Paulo, Molina, Clyde, \& Berger, 2008; Overstall \& Forster, 2010;
-Rouder, Morey, Speckman, \& Province, 2012): \[
-\begin{aligned}
-g_\omega &\sim \mbox{inverse-$\chi^2$}(1,r^2_\omega),\\
-g_\gamma &\sim \mbox{inverse-$\chi^2$}(1,r^2_\gamma),\\
-g_\theta &\sim \mbox{inverse-$\chi^2$}(1,r^2_\theta),\\
-\end{aligned}
-\] where there is a single degree of freedom for each distribution, and
-scales of \(r^2_\omega\), \(r^2_\gamma\), and \(r^2_\theta\). The scaled
-inverse-\(\chi^2\) is chosen because it makes the ensuing Bayes factor
-computations convenient and, additionally, it leads to inference that
-has strong objective Bayes properties (Berger, 2006; Liang et al.,
-2008). For example, it may be shown that with this choice the Bayes
-factor goes to appropriate extremes as sample sizes increase or as the
-data becomes less and less variable.
-
-The critical issue is the setting of scale constants: \(r^2_\omega\),
-\(r^2_\gamma\), and \(r^2_\theta\). At first glance, setting these
-constants seems arbitrary. More alarming, the Bayes factor model
-comparisons will depend on these settings. It is for this reason---that
-seemingly arbitrary settings have big impacts on inference--- that
-Gelman \& Carlin (2017) are skeptical about the usefulness of Bayes
-factors. Here we justify our settings. Subsequently, we will explore the
-sensitivity of inference to reasonable variations in these settings.
+The above models are estimated in the Bayesian framework, and as such,
+priors are placed on parameters. The critical settings are for the scale
+parameters \(r_\alpha\), \(r_\theta\), \(r_{\mu_theta}\), \(r_\nu\),
+\(r_\omega\), and \(r_\gamma\) In this section, we justify our choices
+for these settings. In the next section, we discuss how the choices
+affect analysis.
 
 As substantive scientist we have background knowledge of how variable
 effects tend to be in comparable experiments. In a typical Stroop or
 flanker experiment, the trial-to-trial standard deviation is somewhere
 around 200 ms to 300 ms. Hedge et al. (2018) had particularly fast and
 error prone responses in their data set, and as a result, we take the
-200 ms value to help set prior scale constants. A healthy Stroop or
-flanker effect here would be about 50 ms, or 0.25 of the trial-to-trial
-standard deviation. The next question is how much do we think people
-could possible vary in each task. We chose 33.33 ms or \(r_\theta=\)
-0.17 of the trial-to-trial standard deviation, and this value was used
-in both the full correlation and no correlation models. To set
-\(r_\omega\) and \(r_\gamma\), we equated the bivariate variances
+200 ms value to help set prior scale constants. In our experience people
+also vary about this much, that is, in ordinary response time
+experiments, that variation of people is on the order of a few hundred
+milliseconds. We set \(r_\alpha=\) 1 to reflect that the expected
+trial-to-trial variation and expected variation across people on over
+response time is about the same size.
+
+A healthy Stroop or flanker effect here would be about 50 ms, or 0.25 of
+the trial-to-trial standard deviation. Hence, we set The next question
+is how much do we think people could possible vary in each task. We
+chose 33.33 ms or \(r_\theta=\) 0.17 of the trial-to-trial standard
+deviation, and this value was used in both the full correlation and no
+correlation models. This value reflects our belief that nobody has
+negative true Stroop of flanker effects, and therefore, the overall size
+of the effect, 50 ms, limits the possible size of the variability. To
+set \(r_\omega\) and \(r_\gamma\), we equated the bivariate variances
 between the general model and no correlation model and chose
 \(r_\gamma\) to be 0.67 of \(r_\omega\). The reason we chose this ratio
 is that we \emph{a priori} expect some positive covariation across the
@@ -1134,10 +1185,46 @@ Shown are the density functions for the standard deviations
 for the correlation coefficient \(\rho\).}
 \end{figure}
 
+\subsection{How To Analyse The Model}\label{how-to-analyse-the-model}
+
+We analyzed the above models in the \texttt{BayesFactor} package (Morey
+\& Rouder, 2015) in the \texttt{R} environment. This package provides
+for the analysis of a wide variety of ANOVA and regression models. It
+has been a key infrastructure component of the increasing popularity of
+Bayes factor model comparison in psychological science, and serves as
+the back end computational engine in JASP (Love et al., 2015). One of
+the key advantages here is that \texttt{BayeFactor} implements the
+\(g\)-prior set up, and this fact makes using it simple. The critical
+function for analysis is the function \texttt{nWayAOV()} (documentation
+available at
+\url{https://www.rdocumentation.org/packages/BayesFactor/versions/0.9.12-4.2/topics/nWayAOV})
+This function outputs posterior distributions for all parameters and a
+Bayes factor model comparison statistic. The inputs to it are the data,
+the models defined by a design matrix, and the \(g\)-prior scale
+settings.
+
+As mentioned previously, this paper and all the code needed for analysis
+and graphs are available at
+\url{https://github.com/PerceptionAndCognitionLab/ctx-reliability}. The
+heart of our code is at
+\href{https://github.com/PerceptionAndCognitionLab/ctx-reliability/blob/public/share/lib.R}{share/lib.R}.
+The \texttt{R} script contains functions for loading Hedge et al's data
+and cleaning it. The function \texttt{design1Session} sets up a design
+matrix for the single-task model for inputted data. The function
+\texttt{est1Session} then returns the model-based estimates for the
+specified prior settings. The functions for two tasks work similarly.
+
 \subsection{Sensitivity to Prior
 Specification}\label{sensitivity-to-prior-specification}
 
-One issue is that Bayes factor values are dependent on prior
+When performing parameter estimation, the above models are rather robust
+to the choice of prior form and prior settings. The reason is simple,
+the priors are rather diffuse and the sample sizes in the data sets are
+quite large. Changes in the scale settings has minimal effects on the
+posterior distributions of the parameters.
+
+The influence of the prior settings is more relevant for model
+comparison, and the Bayes factor values are dependent on prior
 specification. A few points of context are helpful in understanding this
 dependence. It seems reasonable to expect that if two researchers run
 the same experiment and obtain the same data, then they should reach
@@ -1145,27 +1232,28 @@ similar conclusions. To meet this expectation, many Bayesian analysts
 actively seek to minimize this dependence by picking likelihoods, prior
 parametric forms, and heuristic methods of inference so that variation
 in prior settings have minimal influence (Aitkin, 1991; Gelman \&
-Shalizi, 2013; Kruschke, 2012; Spiegelhalter et al., 2002). In the
-context of these views, the dependence of prior settings on inference is
-viewed negatively; not only is it something to be avoided, it is a
-threat to the validity of Bayesian analysis.
+Shalizi, 2013; Kruschke, 2014; Spiegelhalter, Best, Carlin, \& Linde,
+2002). In the context of these views, the dependence of prior settings
+on inference is viewed negatively; not only is it something to be
+avoided, it is a threat to the validity of Bayesian analysis.
 
 We reject this expectation that minimization of prior effects is
-necessary or even laudable. Rouder et al. (2016) argue that the goal of
-analysis is to add value by searching for theoretically-meaningful
-structure in data. Vanpaemel (2010) and Vanpaemel \& Lee (2012) provide
-a particularly appealing view of the prior in this light. Accordingly,
-the prior is where theoretically important constraint is encoded in the
-model. When different researchers use different priors, they are testing
-different theoretical constraints, and not surprisingly, they will reach
-different opinions about the data. Rouder et al. (2016) argue that this
-variation is not problematic in fact it should be expected and seen
-positively. Methods that are insensitive to different theoretical
-commitments are not very useful. Rouder et al. (2016) recommend that so
-long as various prior settings are justifiable, the variation in results
-should be embraced as the legitimate diversity of opinion. When
-reasonable prior settings result in conflicting conclusions, we realize
-the data do not afford the precision to adjudicate among the positions.
+necessary or even laudable. Rouder, Morey, and Wagenmakers (2016) argue
+that the goal of analysis is to add value by searching for
+theoretically-meaningful structure in data. Vanpaemel (2010) and
+Vanpaemel and Lee (2012) provide a particularly appealing view of the
+prior in this light. Accordingly, the prior is where theoretically
+important constraint is encoded in the model. When different researchers
+use different priors, they are testing different theoretical
+constraints, and not surprisingly, they will reach different opinions
+about the data. Rouder et al. (2016) argue that this variation is not
+problematic in fact it should be expected and seen positively. Methods
+that are insensitive to different theoretical commitments are not very
+useful. Rouder et al. (2016) recommend that so long as various prior
+settings are justifiable, the variation in results should be embraced as
+the legitimate diversity of opinion. When reasonable prior settings
+result in conflicting conclusions, we realize the data do not afford the
+precision to adjudicate among the positions.
 
 The critical prior specifications in the models are the settings
 \(r_\theta\), \(r_\omega\), and \(r_\gamma\). How does the Bayes factor
@@ -1205,10 +1293,10 @@ model. These are relatively stable results bolstering the claim that
 there is evidence for a lack of correlation. For the high reliability
 case, the full correlation model wins in all cases, but the Bayes factor
 values are quite variable, from 3-to-1 to 176-to-1. Here we are less
-sanguine because the evidence is more dependent on prior assumptions.
+comfortable because the evidence is more dependent on prior assumptions.
 Had we taken a larger bracket, the model preferences may have even
 reversed. While we may favor a full correlation model, that preference
-should be tempered and made with caution.
+should be tempered by these sensitivity analyses.
 
 \begin{table}[tbp]
 \begin{center}
@@ -1219,9 +1307,9 @@ should be tempered and made with caution.
 $r_\theta$ & \multicolumn{1}{c}{$r_\omega$} & \multicolumn{1}{c}{$r_\gamma$} & \multicolumn{1}{c}{Stroop v. Flanker, $B_{0g}$} & \multicolumn{1}{c}{High Correlation, $B_{1g}$}\\
 \midrule
 0.17 & 0.14 & 0.1 & 5.4 & 31\\
-0.25 & 0.22 & 0.14 & 8.5 & 176\\
-0.05 & 0.04 & 0.03 & 9.3 & 3\\
-0.17 & 0.12 & 0.12 & 4.9 & 73\\
+0.25 & 0.22 & 0.14 & 8.6 & 170\\
+0.05 & 0.04 & 0.03 & 9.3 & 2.9\\
+0.17 & 0.12 & 0.12 & 4.8 & 76\\
 0.17 & 0.2 & 0.07 & 11 & 12\\
 \bottomrule
 \addlinespace
@@ -1235,8 +1323,10 @@ $r_\theta$ & \multicolumn{1}{c}{$r_\omega$} & \multicolumn{1}{c}{$r_\gamma$} & \
 
 \newpage
 
-\section*{References}\label{references}
-\addcontentsline{toc}{section}{References}
+\section{References}\label{references}
+
+\begingroup
+\setlength{\parindent}{-0.5in} \setlength{\leftskip}{0.5in}
 
 \hypertarget{refs}{}
 \hypertarget{ref-Aitkin:1991}{}
@@ -1263,10 +1353,6 @@ Carpenter, B., Gelman, A., Hoffman, M. D., Lee, D., Goodrich, B.,
 Bettencourt, M., \ldots{} Riddell, A. (2017). Stan: A probabilistic
 programming language. \emph{Journal of Statistical Software}, \emph{76}.
 
-\hypertarget{ref-deFinetti:1974}{}
-de Finetti, B. (1974). \emph{Theory of probability} (Vol. 1). New York:
-John Wiley; Sons.
-
 \hypertarget{ref-Edwards:etal:1963}{}
 Edwards, W., Lindman, H., \& Savage, L. J. (1963). Bayesian statistical
 inference for psychological research. \emph{Psychological Review},
@@ -1288,10 +1374,6 @@ and interference control functions: A latent-variable analysis.
 \emph{Journal of Experimental Psychology: General}, \emph{133},
 101--135.
 
-\hypertarget{ref-Gelman:Carlin:2017}{}
-Gelman, A., \& Carlin, J. (2017). \emph{Some natural solutions to the
-\(p\)-value communication problem---and why they won't work}.
-
 \hypertarget{ref-Gelman:Shalizi:2013}{}
 Gelman, A., \& Shalizi, C. R. (2013). Philosophy and the practice of
 Bayesian statistics. \emph{British Journal of Mathematical and
@@ -1311,10 +1393,10 @@ Bulletin \& Review}, \emph{23}(3), 750--763.
 Haaf, J. M., \& Rouder, J. N. (2017). Developing constraint in Bayesian
 mixed models. \emph{Psychological Methods}, \emph{22}(4), 779--798.
 
-\hypertarget{ref-Haaf:Rouder:submitted}{}
-Haaf, J. M., \& Rouder, J. N. (2018). \emph{Some do and some don't?
-Accounting for varieties of individual difference structures.} Retrieved
-from \url{https://psyarxiv.com/zwjtp/}
+\hypertarget{ref-Haaf:Rouder:inpress}{}
+Haaf, J. M., \& Rouder, J. N. (2018). Some do and some don't? Accounting
+for variability of individual difference structures. \emph{Psychonomic
+Bulletin and Review}. Retrieved from \url{https://psyarxiv.com/zwjtp/}
 
 \hypertarget{ref-Hedge:etal:2018}{}
 Hedge, C., Powell, G., \& Sumner, P. (2018). The reliability paradox:
@@ -1341,29 +1423,14 @@ statistics}. Cambridge: Cambridge University Press.
 Jeffreys, H. (1961). \emph{Theory of probability (3rd edition)}. New
 York: Oxford University Press.
 
-\hypertarget{ref-Kruschke:2012}{}
-Kruschke, J. K. (2012). Bayesian estimation supersedes the \(t\) test.
-\emph{Journal of Experimental Psychology: General}.
-
-\hypertarget{ref-Kruschke:Liddell:2017}{}
-Kruschke, J. K., \& Liddell, T. M. (2017). The Bayesian new statistics:
-Hypothesis testing, estimation, meta-analysis, and power analysis from a
-Bayesian perspective. \emph{Psychonomic Bulletin \& Review}. Retrieved
-from \url{http://link.springer.com/article/10.3758/s13423-016-1221-4}
-
-\hypertarget{ref-Laplace:1986}{}
-Laplace, P. S. (1986). Memoir on the probability of the causes of
-events. \emph{Statistical Science}, \emph{1}(3), 364--378. Retrieved
-from \url{http://www.jstor.org/stable/2245476}
+\hypertarget{ref-Kruschke:2014}{}
+Kruschke, J. K. (2014). \emph{Doing bayesian data analysis, 2nd edition:
+A tutorial with r, jags, and stan}. Waltham, MA: Academic Press.
 
 \hypertarget{ref-Lee:Webb:2005}{}
 Lee, M. D., \& Webb, M. R. (2005). Modeling individual differences in
 cognition. \emph{Psychonomic Bulletin \& Review}, \emph{12}(4),
 605--621.
-
-\hypertarget{ref-Lee:1997}{}
-Lee, P. M. (1997). \emph{Bayesian statistics: An introduction}. New
-York: Wiley.
 
 \hypertarget{ref-Lee:2007}{}
 Lee, S.-Y. (2007). \emph{Structural equation modelling: A bayesian
@@ -1383,26 +1450,19 @@ from \url{http://pubs.amstat.org/doi/pdf/10.1198/016214507000001337}
 Lord, F. M., \& Novick, M. R. (1968). \emph{Statistical theories of
 mental test scores}. Reading, MA: Addison-Wesley.
 
+\hypertarget{ref-Love:etal:2015}{}
+Love, J., Selker, R., Verhagen, J., Smira, M., Wild, A., Marsman, M.,
+\ldots{} Wagenmakers, E.-J. (2015). Software to sharpen your stats.
+\emph{APS Observer}, \emph{28}, 27--29.
+
 \hypertarget{ref-MacLeod:1991}{}
 MacLeod, C. (1991). Half a century of research on the Stroop effect: An
 integrative review. \emph{Psychological Bulletin}, \emph{109}, 163--203.
 
-\hypertarget{ref-Morey:etal:2016}{}
-Morey, R. D., Romeijn, J.-W., \& Rouder, J. N. (2016). The philosophy of
-Bayes factors and the quantification of statistical evidence.
-\emph{Journal of Mathematical Psychology}, --. Retrieved from
-\url{http://www.sciencedirect.com/science/article/pii/S0022249615000723}
-
-\hypertarget{ref-Myung:Pitt:1997}{}
-Myung, I.-J., \& Pitt, M. A. (1997). Applying Occam's razor in modeling
-cognition: A Bayesian approach. \emph{Psychonomic Bulletin and Review},
-\emph{4}, 79--95.
-
-\hypertarget{ref-Overstall:Forster:2010}{}
-Overstall, A. M., \& Forster, J. J. (2010). Default bayesian model
-determination methods for generalised linear mixed models.
-\emph{Computational Statistics \& Data Analysis}, \emph{54}(12),
-3269--3288.
+\hypertarget{ref-Morey:Rouder:BayesFactorPackage}{}
+Morey, R. D., \& Rouder, J. N. (2015). BayesFactor 0.9.12-2.
+Comprehensive R Archive Network. Retrieved from
+\url{http://cran.r-project.org/web/packages/BayesFactor/index.html}
 
 \hypertarget{ref-Pettigrew:Martin:2014}{}
 Pettigrew, C., \& Martin, R. C. (2014). Cognitive declines in healthy
@@ -1424,31 +1484,19 @@ Learning, Memory, and Cognition}. Retrieved from
 \hypertarget{ref-Rouder:Haaf:2018a}{}
 Rouder, J. N., \& Haaf, J. M. (2018). Power, dominance, and constraint:
 A note on the appeal of different design traditions. \emph{Advances in
-Methods and Practices in Psychological Science}. Retrieved from
-\url{https://doi.org/10.1177/2515245917745058}
+Methods and Practices in Psychological Science}, \emph{1}, 19--26.
+Retrieved from \url{https://doi.org/10.1177/2515245917745058}
 
 \hypertarget{ref-Rouder:Lu:2005}{}
 Rouder, J. N., \& Lu, J. (2005). An introduction to Bayesian
 hierarchical models with an application in the theory of signal
 detection. \emph{Psychonomic Bulletin and Review}, \emph{12}, 573--604.
 
-\hypertarget{ref-Rouder:etal:2018}{}
-Rouder, J. N., Haaf, J. M., \& Aust, F. (2018). From theories to models
-to predictions: A Bayesian model comparison approach.
-\emph{Communication Monographs}, \emph{85}, 41--56. Retrieved from
-\url{https://doi.org/10.1080/03637751.2017.1394581}
-
 \hypertarget{ref-Rouder:etal:2016b}{}
 Rouder, J. N., Morey, R. D., \& Wagenmakers, E.-J. (2016). The interplay
 between subjectivity, statistical practice, and psychological science.
 \emph{Collabra}, \emph{2}, 6. Retrieved from
 \url{http://doi.org/10.1525/collabra.28}
-
-\hypertarget{ref-Rouder:etal:2012}{}
-Rouder, J. N., Morey, R. D., Speckman, P. L., \& Province, J. M. (2012).
-Default Bayes factors for ANOVA designs. \emph{Journal of Mathematical
-Psychology}, \emph{56}, 356--374. Retrieved from
-\url{http://dx.doi.org/10.1016/j.jmp.2012.08.001}
 
 \hypertarget{ref-Schmiedek:etal:2007}{}
 Schmiedek, F., Oberauer, K., Wilhelm, O., Süß, H.-M., \& Wittmann, W. W.
@@ -1460,6 +1508,16 @@ distributions and their relations to working memory and intelligence.
 Skrondal, A., \& Rabe-Hesketh, S. (2004). \emph{Generalized latent
 variable modeling: Multilevel, longitudinal, and structural equation
 models}. Boca Raton: CRC Press.
+
+\hypertarget{ref-Spearman:1904}{}
+Spearman, C. (1904a). 'General intelligence,' obectively determined and
+measured. \emph{American Journal of Psychology}, \emph{15}, 201--293.
+
+\hypertarget{ref-Spearman:1904a}{}
+Spearman, C. (1904b). The proof and measurement of association between
+two things. \emph{American Journal of Psychology}, \emph{15}, 72--101.
+Retrieved from
+\url{https://www.jstor.org/stable/pdf/1412159.pdf?refreqid=excelsior\%3Af2a400c0643864ecfb26464f09f022ce}
 
 \hypertarget{ref-Spiegelhalter:etal:2002}{}
 Spiegelhalter, D. J., Best, N. G., Carlin, B. P., \& Linde, A. van der.
@@ -1487,22 +1545,12 @@ Vanpaemel, W., \& Lee, M. D. (2012). Using priors to formalize theory:
 Optimal attention and the generalized context model. \emph{Psychonomic
 Bulletin \& Review}, \emph{19}, 1047--1056.
 
-\hypertarget{ref-Vehtari:etal:2017}{}
-Vehtari, A., Gelman, A., \& Gabry, J. (2017). Practical Bayesian model
-evaluation using leave-one-out cross-validation and wAIC.
-\emph{Statistics and Computing}, \emph{27}(5), 1413--1432.
-
 \hypertarget{ref-Voelkle:etal:2014}{}
 Voelkle, M. C., Brose, A., Schmiedek, F., \& Lindenberger, U. (2014).
 Toward a unified framework for the study of between-person and
 within-person structures: Building a bridge between two research
 paradigms. \emph{Multivariate Behavioral Research}, \emph{49}(3),
 193--213.
-
-\hypertarget{ref-Wagenmakers:2007}{}
-Wagenmakers, E.-J. (2007). A practical solution to the pervasive problem
-of p values. \emph{Psychonomic Bulletin and Review}, \emph{14},
-779--804. Retrieved from \url{https://doi.org/10.3758/BF03194105}
 
 \hypertarget{ref-Zellner:1986}{}
 Zellner, A. (1986). On assessing prior distirbutions and Bayesian
@@ -1516,6 +1564,8 @@ regression hypotheses. In J. M. Bernardo, M. H. DeGroot, D. V. Lindley,
 \& A. F. M. Smith (Eds.), \emph{Bayesian statistics: Proceedings of the
 First International Meeting held in Valencia (Spain)} (pp. 585--603).
 University of Valencia.
+
+\endgroup
 
 
 
